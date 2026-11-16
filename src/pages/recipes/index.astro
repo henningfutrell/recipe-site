@@ -1,0 +1,66 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
+import { getCollection } from 'astro:content';
+
+const allRecipes = await getCollection('recipes');
+const sortedRecipes = allRecipes.sort((a, b) => 
+  a.data.title.localeCompare(b.data.title)
+);
+---
+
+<Layout 
+  title="All Recipes - Henning's Recipes"
+  description="Browse all recipes in Henning's collection"
+>
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold mb-4">All Recipes</h1>
+    <p class="text-gray-600 mb-6">Browse through {allRecipes.length} delicious recipes</p>
+    
+    <div data-pagefind-ignore class="mb-8">
+      <div id="search"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {sortedRecipes.map((recipe) => (
+      <RecipeCard
+        title={recipe.data.title}
+        description={recipe.data.description}
+        id={recipe.id}
+        totalTime={recipe.data.totalTime}
+        servings={recipe.data.servings}
+        categories={recipe.data.categories}
+      />
+    ))}
+  </div>
+</Layout>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', function() {
+    const loadPagefind = async () => {
+      try {
+        const pagefind = await import('/pagefind/pagefind.js');
+        await pagefind.options({
+          baseUrl: '/'
+        });
+        await pagefind.init();
+        
+        const search = document.querySelector('#search');
+        if (search) {
+          new PagefindUI({ 
+            element: '#search',
+            showSubResults: true,
+            showImages: false
+          });
+        }
+      } catch (e) {
+        console.log('Pagefind not loaded yet (dev mode)');
+      }
+    };
+    
+    loadPagefind();
+  });
+</script>

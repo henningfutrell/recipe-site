@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RecipeCard from '../components/RecipeCard.astro';
+import { getCollection } from 'astro:content';
+
+const allRecipes = await getCollection('recipes');
+const sortedRecipes = allRecipes.sort((a, b) => 
+  b.data.dateAdded.getTime() - a.data.dateAdded.getTime()
+);
+const recentRecipes = sortedRecipes.slice(0, 6);
+---
+
+<Layout title="Henning's Recipes - Home">
+  <div class="text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to My Recipe Collection</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      Discover delicious recipes from my personal collection. From quick weeknight dinners to indulgent desserts.
+    </p>
+  </div>
+
+  <section class="mb-12">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">Recent Recipes</h2>
+      <a href="/recipes" class="text-blue-600 hover:text-blue-800 font-semibold">
+        View All →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {recentRecipes.map((recipe) => (
+        <RecipeCard
+          title={recipe.data.title}
+          description={recipe.data.description}
+          id={recipe.id}
+          totalTime={recipe.data.totalTime}
+          servings={recipe.data.servings}
+          categories={recipe.data.categories}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="bg-white rounded-lg shadow-md p-8 text-center">
+    <h2 class="text-2xl font-bold mb-4">Explore by Category</h2>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a href="/categories/breakfast" class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">Breakfast</a>
+      <a href="/categories/brunch" class="px-4 py-2 bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors">Brunch</a>
+      <a href="/categories/dinner" class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full hover:bg-purple-200 transition-colors">Dinner</a>
+      <a href="/categories/main-course" class="px-4 py-2 bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors">Main Course</a>
+      <a href="/categories/dessert" class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full hover:bg-yellow-200 transition-colors">Dessert</a>
+      <a href="/categories/baking" class="px-4 py-2 bg-pink-100 text-pink-800 rounded-full hover:bg-pink-200 transition-colors">Baking</a>
+    </div>
+  </section>
+</Layout>

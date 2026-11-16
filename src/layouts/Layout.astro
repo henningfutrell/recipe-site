@@ -1,0 +1,45 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Henning's personal recipe collection" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900">
+    <header class="bg-white shadow-sm">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-2xl font-bold text-gray-900 hover:text-gray-700">
+            Henning's Recipes
+          </a>
+          <div class="flex gap-6">
+            <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+            <a href="/recipes" class="text-gray-600 hover:text-gray-900">All Recipes</a>
+            <a href="/about" class="text-gray-600 hover:text-gray-900">About</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <slot />
+    </main>
+    <footer class="bg-white mt-16 border-t">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-600">
+        <p>&copy; {new Date().getFullYear()} Henning's Recipes. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

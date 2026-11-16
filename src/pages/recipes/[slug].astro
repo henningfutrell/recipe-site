@@ -1,0 +1,155 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes');
+  return recipes.map(recipe => {
+    // In Astro 7 with loaders, id is the filename without extension
+    const slug = recipe.id.replace(/\.md$/, '');
+    return {
+      params: { slug },
+      props: { recipe }
+    };
+  });
+}
+
+const { recipe } = Astro.props;
+const { Content } = await render(recipe);
+
+const recipeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Recipe",
+  "name": recipe.data.title,
+  "description": recipe.data.description,
+  "prepTime": `PT${recipe.data.prepTime}M`,
+  "cookTime": `PT${recipe.data.cookTime}M`,
+  "totalTime": `PT${recipe.data.totalTime}M`,
+  "recipeYield": `${recipe.data.servings} servings`,
+  "recipeCategory": recipe.data.categories.join(', '),
+  "keywords": recipe.data.tags.join(', '),
+  "recipeIngredient": recipe.data.ingredients.flatMap(group => group.items),
+  "recipeInstructions": recipe.data.steps.map((step, index) => ({
+    "@type": "HowToStep",
+    "position": index + 1,
+    "text": step
+  })),
+  "datePublished": recipe.data.dateAdded.toISOString()
+};
+---
+
+<Layout title={`${recipe.data.title} - Henning's Recipes`} description={recipe.data.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(recipeJsonLd)} />
+  
+  <article class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <div class="flex gap-2 mb-4">
+        {recipe.data.categories.map((category) => (
+          <a 
+            href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
+            class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors"
+          >
+            {category}
+          </a>
+        ))}
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">{recipe.data.title}</h1>
+      <p class="text-xl text-gray-600 mb-6">{recipe.data.description}</p>
+      
+      <div class="flex flex-wrap gap-4 text-gray-700 bg-white rounded-lg p-6 shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold">Prep:</span>
+          <span>{recipe.data.prepTime} min</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold">Cook:</span>
+          <span>{recipe.data.cookTime} min</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold">Total:</span>
+          <span>{recipe.data.totalTime} min</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold">Servings:</span>
+          <span>{recipe.data.servings}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 mb-8">
+      <div class="md:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 print:break-inside-avoid">
+          <h2 class="text-2xl font-bold mb-4">Ingredients</h2>
+          {recipe.data.ingredients.map((group) => (
+            <div class="mb-4">
+              {group.group && <h3 class="font-semibold text-gray-700 mb-2">{group.group}</h3>}
+              <ul class="space-y-2">
+                {group.items.map((item) => (
+                  <li class="flex items-start">
+                    <span class="text-blue-600 mr-2">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="bg-white rounded-lg shadow-md p-6 print:break-inside-avoid">
+          <h2 class="text-2xl font-bold mb-4">Instructions</h2>
+          <ol class="space-y-4">
+            {recipe.data.steps.map((step, index) => (
+              <li class="flex gap-4">
+                <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                  {index + 1}
+                </span>
+                <p class="pt-1">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 prose max-w-none">
+      <Content />
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-2">
+      <span class="text-gray-700 font-semibold">Tags:</span>
+      {recipe.data.tags.map((tag) => (
+        <a 
+          href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`}
+          class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm hover:bg-gray-300 transition-colors"
+        >
+          {tag}
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-8 print:hidden">
+      <button 
+        onclick="window.print()"
+        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+      >
+        🖨️ Print Recipe
+      </button>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  @media print {
+    body {
+      background: white;
+    }
+    header, footer, button {
+      display: none;
+    }
+    article {
+      max-width: 100%;
+    }
+  }
+</style>
