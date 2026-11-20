@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="About - Henning's Recipes" description="About Henning's Recipe Collection">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold mb-6">About This Recipe Collection</h1>
+    
+    <div class="prose prose-lg max-w-none">
+      <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Welcome!</h2>
+        <p class="text-gray-700 mb-4">
+          This is my personal recipe collection where I gather and share recipes I love to cook. 
+          From quick weeknight dinners to special occasion desserts, you'll find a variety of 
+          dishes that have been tested in my kitchen.
+        </p>
+        <p class="text-gray-700">
+          Each recipe includes detailed instructions, prep and cook times, and ingredient lists 
+          to help you recreate these dishes at home. Feel free to explore, search, and try them out!
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-4">How to Use This Site</h2>
+        <ul class="space-y-2 text-gray-700">
+          <li><strong>Browse:</strong> Check out recent recipes on the home page or view all recipes in the recipe index</li>
+          <li><strong>Search:</strong> Use the search feature on the recipes page to find specific dishes</li>
+          <li><strong>Filter:</strong> Click on categories or tags to find recipes by type</li>
+          <li><strong>Print:</strong> Each recipe has a print button for easy reference while cooking</li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-bold mb-4">About the Tech</h2>
+        <p class="text-gray-700 mb-4">
+          This site is built with <a href="https://astro.build" class="text-blue-600 hover:text-blue-800">Astro</a> 
+          and <a href="https://tailwindcss.com" class="text-blue-600 hover:text-blue-800">Tailwind CSS</a>, 
+          featuring <a href="https://pagefind.app" class="text-blue-600 hover:text-blue-800">Pagefind</a> for 
+          fast, client-side search. It's deployed on 
+          <a href="https://pages.cloudflare.com" class="text-blue-600 hover:text-blue-800">Cloudflare Pages</a>.
+        </p>
+        <p class="text-gray-700">
+          All recipes are stored as Markdown files with structured metadata, making it easy to add new recipes 
+          and maintain the collection over time.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,38 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  id: string;
+  totalTime: number;
+  servings: number;
+  categories: string[];
+}
+
+const { title, description, id, totalTime, servings, categories } = Astro.props;
+const slug = id.replace(/\.md$/, '');
+---
+
+<article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+  <div class="p-6">
+    <div class="flex gap-2 mb-3">
+      {categories.map((category) => (
+        <a 
+          href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
+          class="text-xs font-semibold text-blue-600 hover:text-blue-800"
+        >
+          {category}
+        </a>
+      ))}
+    </div>
+    <h3 class="text-xl font-bold mb-2">
+      <a href={`/recipes/${slug}`} class="text-gray-900 hover:text-blue-600">
+        {title}
+      </a>
+    </h3>
+    <p class="text-gray-600 mb-4 line-clamp-2">{description}</p>
+    <div class="flex items-center gap-4 text-sm text-gray-500">
+      <span>⏱️ {totalTime} min</span>
+      <span>🍽️ {servings} servings</span>
+    </div>
+  </div>
+</article>

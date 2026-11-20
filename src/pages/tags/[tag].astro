@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes');
+  const tags = new Set<string>();
+  
+  recipes.forEach(recipe => {
+    recipe.data.tags.forEach(tag => {
+      tags.add(tag.toLowerCase().replace(/\s+/g, '-'));
+    });
+  });
+
+  return Array.from(tags).map(tag => {
+    const filteredRecipes = recipes.filter(recipe =>
+      recipe.data.tags.some(t => 
+        t.toLowerCase().replace(/\s+/g, '-') === tag
+      )
+    );
+    
+    const tagTitle = filteredRecipes[0]?.data.tags.find(t =>
+      t.toLowerCase().replace(/\s+/g, '-') === tag
+    ) || tag;
+
+    return {
+      params: { tag },
+      props: { recipes: filteredRecipes, tagTitle }
+    };
+  });
+}
+
+const { recipes, tagTitle } = Astro.props;
+---
+
+<Layout 
+  title={`${tagTitle} Recipes - Henning's Recipes`}
+  description={`Browse all recipes tagged with ${tagTitle.toLowerCase()}`}
+>
+  <div class="mb-8">
+    <a href="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Back to Home</a>
+    <h1 class="text-4xl font-bold mb-4">#{tagTitle}</h1>
+    <p class="text-gray-600">{recipes.length} recipe{recipes.length !== 1 ? 's' : ''} with this tag</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {recipes.map((recipe) => (
+      <RecipeCard
+        title={recipe.data.title}
+        description={recipe.data.description}
+        id={recipe.id}
+        totalTime={recipe.data.totalTime}
+        servings={recipe.data.servings}
+        categories={recipe.data.categories}
+      />
+    ))}
+  </div>
+</Layout>
