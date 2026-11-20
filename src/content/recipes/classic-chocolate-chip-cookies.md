@@ -9,18 +9,37 @@ categories: [Dessert, Baking]
 tags: [cookies, chocolate, dessert, baking, classic, family-friendly]
 dateAdded: 2026-11-10T14:00:00Z
 ingredients:
-  - group: ""
-    items:
-      - 2 1/4 cups all-purpose flour
-      - 1 teaspoon baking soda
-      - 1 teaspoon salt
-      - 1 cup (2 sticks) unsalted butter, softened
-      - 3/4 cup granulated sugar
-      - 3/4 cup packed brown sugar
-      - 2 large eggs
-      - 2 teaspoons vanilla extract
-      - 2 cups semi-sweet chocolate chips
-      - 1 cup chopped walnuts (optional)
+  - items:
+      - quantity: 2.25
+        unit: cup
+        item: all-purpose flour
+      - quantity: 1
+        unit: teaspoon
+        item: baking soda
+      - quantity: 1
+        unit: teaspoon
+        item: salt
+      - quantity: 1
+        unit: cup
+        item: "unsalted butter, softened"
+      - quantity: 0.75
+        unit: cup
+        item: granulated sugar
+      - quantity: 0.75
+        unit: cup
+        item: packed brown sugar
+      - quantity: 2
+        item: large egg
+        plural: large eggs
+      - quantity: 2
+        unit: teaspoon
+        item: vanilla extract
+      - quantity: 2
+        unit: cup
+        item: semi-sweet chocolate chips
+      - quantity: 1
+        unit: cup
+        item: "chopped walnuts (optional)"
 steps:
   - Preheat oven to 375°F (190°C).
   - In a medium bowl, whisk together flour, baking soda, and salt. Set aside.

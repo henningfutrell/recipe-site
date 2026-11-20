@@ -11,27 +11,57 @@ dateAdded: 2026-11-05T18:00:00Z
 ingredients:
   - group: Protein & Vegetables
     items:
-      - 1.5 lbs boneless, skinless chicken breast, cut into bite-sized pieces
-      - 2 cups broccoli florets
-      - 1 red bell pepper, sliced
-      - 1 yellow bell pepper, sliced
-      - 1 medium carrot, thinly sliced
-      - 3 cloves garlic, minced
-      - 1 tablespoon fresh ginger, minced
-      - 2 tablespoons vegetable oil
+      - quantity: 1.5
+        unit: lb
+        item: "boneless, skinless chicken breast, cut into bite-sized pieces"
+      - quantity: 2
+        unit: cup
+        item: broccoli florets
+      - quantity: 1
+        item: "red bell pepper, sliced"
+        plural: "red bell peppers, sliced"
+      - quantity: 1
+        item: "yellow bell pepper, sliced"
+        plural: "yellow bell peppers, sliced"
+      - quantity: 1
+        item: "medium carrot, thinly sliced"
+        plural: "medium carrots, thinly sliced"
+      - quantity: 3
+        unit: clove
+        item: "garlic, minced"
+      - quantity: 1
+        unit: tablespoon
+        item: "fresh ginger, minced"
+      - quantity: 2
+        unit: tablespoon
+        item: vegetable oil
   - group: Stir-Fry Sauce
     items:
-      - 1/4 cup soy sauce
-      - 2 tablespoons oyster sauce
-      - 1 tablespoon rice vinegar
-      - 1 tablespoon honey
-      - 1 teaspoon sesame oil
-      - 1 teaspoon cornstarch
-      - 1/4 cup chicken broth
+      - quantity: 0.25
+        unit: cup
+        item: soy sauce
+      - quantity: 2
+        unit: tablespoon
+        item: oyster sauce
+      - quantity: 1
+        unit: tablespoon
+        item: rice vinegar
+      - quantity: 1
+        unit: tablespoon
+        item: honey
+      - quantity: 1
+        unit: teaspoon
+        item: sesame oil
+      - quantity: 1
+        unit: teaspoon
+        item: cornstarch
+      - quantity: 0.25
+        unit: cup
+        item: chicken broth
   - group: For Serving
     items:
-      - Cooked rice or noodles
-      - Sesame seeds and sliced green onions for garnish
+      - item: Cooked rice or noodles
+      - item: Sesame seeds and sliced green onions for garnish
 steps:
   - In a small bowl, whisk together all sauce ingredients (soy sauce, oyster sauce, rice vinegar, honey, sesame oil, cornstarch, and chicken broth). Set aside.
   - Heat 1 tablespoon of vegetable oil in a large wok or skillet over high heat.

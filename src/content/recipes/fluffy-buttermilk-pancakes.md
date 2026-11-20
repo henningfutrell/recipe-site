@@ -11,17 +11,35 @@ dateAdded: 2026-11-01T08:00:00Z
 ingredients:
   - group: Dry Ingredients
     items:
-      - 2 cups all-purpose flour
-      - 2 tablespoons sugar
-      - 2 teaspoons baking powder
-      - 1 teaspoon baking soda
-      - 1/2 teaspoon salt
+      - quantity: 2
+        unit: cup
+        item: all-purpose flour
+      - quantity: 2
+        unit: tablespoon
+        item: sugar
+      - quantity: 2
+        unit: teaspoon
+        item: baking powder
+      - quantity: 1
+        unit: teaspoon
+        item: baking soda
+      - quantity: 0.5
+        unit: teaspoon
+        item: salt
   - group: Wet Ingredients
     items:
-      - 2 cups buttermilk
-      - 2 large eggs
-      - 1/4 cup melted butter, plus more for cooking
-      - 1 teaspoon vanilla extract
+      - quantity: 2
+        unit: cup
+        item: buttermilk
+      - quantity: 2
+        item: large egg
+        plural: large eggs
+      - quantity: 0.25
+        unit: cup
+        item: "melted butter, plus more for cooking"
+      - quantity: 1
+        unit: teaspoon
+        item: vanilla extract
 steps:
   - In a large bowl, whisk together flour, sugar, baking powder, baking soda, and salt.
   - In a separate bowl, whisk together buttermilk, eggs, melted butter, and vanilla extract.
