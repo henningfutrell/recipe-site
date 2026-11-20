@@ -9,7 +9,15 @@ const recipes = defineCollection({
     ingredients: z.array(
       z.object({
         group: z.string().optional(),
-        items: z.array(z.string())
+        items: z.array(
+          z.object({
+            quantity: z.number().positive().optional(),
+            unit: z.string().optional(),
+            item: z.string(),
+            plural: z.string().optional(),
+            fixed: z.boolean().optional()
+          })
+        )
       })
     ),
     steps: z.array(z.string()),

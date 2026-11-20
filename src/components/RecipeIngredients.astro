@@ -1,0 +1,144 @@
+---
+import { formatIngredient, type Ingredient } from '../lib/ingredients.ts';
+import { SHOW_UNIT_TOGGLE } from '../config.ts';
+
+interface Props {
+  ingredients: Array<{ group?: string; items: Ingredient[] }>;
+  servings: number;
+}
+
+const { ingredients, servings } = Astro.props;
+const flat = ingredients.flatMap((group) => group.items);
+let index = 0;
+const groups = ingredients.map((group) => ({
+  group: group.group,
+  items: group.items.map((item) => ({ index: index++, text: formatIngredient(item) }))
+}));
+const presets = [0.5, 1, 2, 3];
+const buttonClass =
+  'px-3 py-1 rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100 aria-pressed:bg-blue-600 aria-pressed:text-white aria-pressed:border-blue-600';
+---
+
+<recipe-scaler data-servings={servings} data-ingredients={JSON.stringify(flat)}>
+  <div class="bg-white rounded-lg shadow-md p-6 print:break-inside-avoid">
+    <h2 class="text-2xl font-bold mb-4">Ingredients</h2>
+
+    <div data-scaler-controls hidden class="mb-6 space-y-3 print:hidden">
+      <div class="flex items-center gap-2">
+        <label for="scaler-servings" class="font-semibold text-gray-700">Servings</label>
+        <button type="button" data-step="-1" class={buttonClass} aria-label="Fewer servings">−</button>
+        <input
+          id="scaler-servings"
+          type="number"
+          inputmode="decimal"
+          min="0.25"
+          step="any"
+          value={servings}
+          class="w-16 px-2 py-1 border border-gray-300 rounded-md text-center"
+        />
+        <button type="button" data-step="1" class={buttonClass} aria-label="More servings">+</button>
+      </div>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Scale the recipe">
+        {presets.map((preset) => (
+          <button type="button" data-preset={preset} class={buttonClass} aria-pressed={preset === 1 ? 'true' : 'false'}>
+            {preset}x
+          </button>
+        ))}
+      </div>
+      {SHOW_UNIT_TOGGLE && (
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Units">
+          <button type="button" data-system="us" class={buttonClass} aria-pressed="false">US</button>
+          <button type="button" data-system="metric" class={buttonClass} aria-pressed="false">Metric</button>
+        </div>
+      )}
+    </div>
+
+    {groups.map((group) => (
+      <div class="mb-4">
+        {group.group && <h3 class="font-semibold text-gray-700 mb-2">{group.group}</h3>}
+        <ul class="space-y-2">
+          {group.items.map((item) => (
+            <li class="flex items-start">
+              <span class="text-blue-600 mr-2" aria-hidden="true">•</span>
+              <span data-ingredient={item.index}>{item.text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</recipe-scaler>
+
+<script>
+  import { formatIngredient, formatServings, type Ingredient, type UnitSystem } from '../lib/ingredients.ts';
+
+  class RecipeScaler extends HTMLElement {
+    private defaultServings = 1;
+    private servings = 1;
+    private system: UnitSystem | undefined;
+    private ingredients: Ingredient[] = [];
+
+    connectedCallback() {
+      this.defaultServings = Number(this.dataset.servings);
+      this.servings = this.defaultServings;
+      this.ingredients = JSON.parse(this.dataset.ingredients ?? '[]');
+      if (!(this.defaultServings > 0)) return;
+
+      const controls = this.querySelector<HTMLElement>('[data-scaler-controls]');
+      const input = this.querySelector<HTMLInputElement>('#scaler-servings');
+      if (!controls || !input) return;
+
+      input.addEventListener('input', () => {
+        const value = Number(input.value);
+        if (value > 0) this.update(value, false);
+      });
+      input.addEventListener('change', () => {
+        if (!(Number(input.value) > 0)) input.value = formatNumber(this.servings);
+      });
+      this.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const next = this.servings + Number(button.dataset.step);
+          if (next > 0) this.update(next);
+        });
+      });
+      this.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((button) => {
+        button.addEventListener('click', () => this.update(this.defaultServings * Number(button.dataset.preset)));
+      });
+      this.querySelectorAll<HTMLButtonElement>('[data-system]').forEach((button) => {
+        button.addEventListener('click', () => {
+          this.system = button.dataset.system as UnitSystem;
+          this.update(this.servings);
+        });
+      });
+
+      controls.hidden = false;
+    }
+
+    private update(servings: number, writeInput = true) {
+      this.servings = servings;
+      const factor = servings / this.defaultServings;
+
+      this.querySelectorAll<HTMLElement>('[data-ingredient]').forEach((element) => {
+        const ingredient = this.ingredients[Number(element.dataset.ingredient)];
+        if (ingredient) element.textContent = formatIngredient(ingredient, factor, this.system);
+      });
+      document.querySelectorAll<HTMLElement>('[data-servings-display]').forEach((element) => {
+        element.textContent = formatServings(servings);
+      });
+      const input = this.querySelector<HTMLInputElement>('#scaler-servings');
+      if (input && writeInput) input.value = formatNumber(servings);
+      this.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(Number(button.dataset.preset) === factor));
+      });
+      this.querySelectorAll<HTMLButtonElement>('[data-system]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.system === this.system));
+      });
+    }
+  }
+
+  function formatNumber(value: number): string {
+    return String(Math.round(value * 100) / 100);
+  }
+
+  customElements.define('recipe-scaler', RecipeScaler);
+</script>

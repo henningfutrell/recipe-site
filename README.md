@@ -60,12 +60,20 @@ dateAdded: 2026-11-16T12:00:00Z
 ingredients:
   - group: Main Ingredients
     items:
-      - 2 cups flour
-      - 1 cup sugar
+      - quantity: 2.25
+        unit: cup
+        item: flour
+      - quantity: 2
+        item: large egg
+        plural: large eggs
+      - quantity: 1
+        unit: pinch
+        item: salt
+        fixed: true
   - group: Optional Toppings
     items:
-      - Chocolate chips
-      - Whipped cream
+      - item: Chocolate chips
+      - item: Whipped cream
 steps:
   - Preheat oven to 350°F.
   - Mix dry ingredients in a large bowl.
@@ -88,11 +96,22 @@ This content appears at the bottom of the recipe page.
 - **categories** (array, required): List of categories (e.g., Breakfast, Dinner, Dessert)
 - **tags** (array, required): List of tags for filtering
 - **ingredients** (array, required): Grouped ingredients
-  - **group** (string, optional): Group heading (leave empty `""` if no groups)
-  - **items** (array): List of ingredient strings
+  - **group** (string, optional): Group heading (leave it out if no groups)
+  - **items** (array): Ingredient lines, each with:
+    - **quantity** (number, optional): Amount for the recipe's `servings`, as a decimal (`2.25` shows as `2 1/4`). Leave it out for lines with no amount.
+    - **unit** (string, optional): Singular unit, for example `cup`, `tablespoon`, `teaspoon`, `lb`, `oz`, `clove`, `g`, `ml`. The page writes the plural form when the amount is more than one.
+    - **item** (string, required): Ingredient name and notes, in the form for one (`large egg`)
+    - **plural** (string, optional): Item text for amounts above one (`large eggs`)
+    - **fixed** (boolean, optional): `true` keeps the amount the same at all servings (a pinch, "to taste")
 - **steps** (array, required): Ordered list of instruction steps
 - **image** (string, optional): Image filename (not yet implemented)
 - **dateAdded** (date, required): ISO 8601 date when recipe was added
+
+### Servings Scaler
+
+Each recipe page has a servings scaler. The reader changes the servings with `+` / `-`, by typing a number, or with the `0.5x`, `1x`, `2x` and `3x` presets, and all scaling amounts update. Without JavaScript, the page shows the amounts as written.
+
+A US/metric unit switch is available but off by default. To show it, set `SHOW_UNIT_TOGGLE` to `true` in `src/config.ts`.
 
 ### Filename Convention
 
@@ -111,6 +130,12 @@ npm run build
 This command:
 1. Runs `astro build` to generate static files in `dist/`
 2. Runs `pagefind` to build the search index
+
+Run the unit tests:
+
+```bash
+npm test
+```
 
 Preview the production build locally:
 

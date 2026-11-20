@@ -1,5 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import RecipeIngredients from '../../components/RecipeIngredients.astro';
+import { formatIngredient } from '../../lib/ingredients.ts';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -28,7 +30,7 @@ const recipeJsonLd = {
   "recipeYield": `${recipe.data.servings} servings`,
   "recipeCategory": recipe.data.categories.join(', '),
   "keywords": recipe.data.tags.join(', '),
-  "recipeIngredient": recipe.data.ingredients.flatMap(group => group.items),
+  "recipeIngredient": recipe.data.ingredients.flatMap(group => group.items.map((item) => formatIngredient(item))),
   "recipeInstructions": recipe.data.steps.map((step, index) => ({
     "@type": "HowToStep",
     "position": index + 1,
@@ -71,29 +73,14 @@ const recipeJsonLd = {
         </div>
         <div class="flex items-center gap-2">
           <span class="font-semibold">Servings:</span>
-          <span>{recipe.data.servings}</span>
+          <span data-servings-display>{recipe.data.servings}</span>
         </div>
       </div>
     </div>
 
     <div class="grid md:grid-cols-3 gap-8 mb-8">
       <div class="md:col-span-1">
-        <div class="bg-white rounded-lg shadow-md p-6 print:break-inside-avoid">
-          <h2 class="text-2xl font-bold mb-4">Ingredients</h2>
-          {recipe.data.ingredients.map((group) => (
-            <div class="mb-4">
-              {group.group && <h3 class="font-semibold text-gray-700 mb-2">{group.group}</h3>}
-              <ul class="space-y-2">
-                {group.items.map((item) => (
-                  <li class="flex items-start">
-                    <span class="text-blue-600 mr-2">•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <RecipeIngredients ingredients={recipe.data.ingredients} servings={recipe.data.servings} />
       </div>
 
       <div class="md:col-span-2">
