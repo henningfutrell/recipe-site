@@ -21,10 +21,10 @@ const recipes = defineCollection({
       })
     ),
     steps: z.array(z.string()),
-    prepTime: z.number(),
+    prepTime: z.number().optional(),
     cookTime: z.number(),
-    totalTime: z.number(),
-    servings: z.number(),
+    totalTime: z.number().optional(),
+    servings: z.number().positive().optional(),
     categories: z.array(z.string()),
     tags: z.array(z.string()),
     image: z.string().optional(),

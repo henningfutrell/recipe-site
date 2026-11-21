@@ -24,10 +24,10 @@ const recipeJsonLd = {
   "@type": "Recipe",
   "name": recipe.data.title,
   "description": recipe.data.description,
-  "prepTime": `PT${recipe.data.prepTime}M`,
+  ...(recipe.data.prepTime !== undefined && { "prepTime": `PT${recipe.data.prepTime}M` }),
   "cookTime": `PT${recipe.data.cookTime}M`,
-  "totalTime": `PT${recipe.data.totalTime}M`,
-  "recipeYield": `${recipe.data.servings} servings`,
+  ...(recipe.data.totalTime !== undefined && { "totalTime": `PT${recipe.data.totalTime}M` }),
+  ...(recipe.data.servings !== undefined && { "recipeYield": `${recipe.data.servings} servings` }),
   "recipeCategory": recipe.data.categories.join(', '),
   "keywords": recipe.data.tags.join(', '),
   "recipeIngredient": recipe.data.ingredients.flatMap(group => group.items.map((item) => formatIngredient(item))),
@@ -59,22 +59,28 @@ const recipeJsonLd = {
       <p class="text-xl text-gray-600 mb-6">{recipe.data.description}</p>
       
       <div class="flex flex-wrap gap-4 text-gray-700 bg-white rounded-lg p-6 shadow-sm">
-        <div class="flex items-center gap-2">
-          <span class="font-semibold">Prep:</span>
-          <span>{recipe.data.prepTime} min</span>
-        </div>
+        {recipe.data.prepTime !== undefined && (
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">Prep:</span>
+            <span>{recipe.data.prepTime} min</span>
+          </div>
+        )}
         <div class="flex items-center gap-2">
           <span class="font-semibold">Cook:</span>
           <span>{recipe.data.cookTime} min</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="font-semibold">Total:</span>
-          <span>{recipe.data.totalTime} min</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="font-semibold">Servings:</span>
-          <span data-servings-display>{recipe.data.servings}</span>
-        </div>
+        {recipe.data.totalTime !== undefined && (
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">Total:</span>
+            <span>{recipe.data.totalTime} min</span>
+          </div>
+        )}
+        {recipe.data.servings !== undefined && (
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">Servings:</span>
+            <span data-servings-display>{recipe.data.servings}</span>
+          </div>
+        )}
       </div>
     </div>
 

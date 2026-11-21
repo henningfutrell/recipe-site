@@ -4,7 +4,8 @@ import { SHOW_UNIT_TOGGLE } from '../config.ts';
 
 interface Props {
   ingredients: Array<{ group?: string; items: Ingredient[] }>;
-  servings: number;
+  /** Without a servings count, the scaler controls stay hidden. */
+  servings?: number;
 }
 
 const { ingredients, servings } = Astro.props;
