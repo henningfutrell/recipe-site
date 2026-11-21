@@ -92,24 +92,24 @@ This content appears at the bottom of the recipe page.
 - **prepTime** (number, required): Prep time in minutes
 - **cookTime** (number, required): Cook time in minutes
 - **totalTime** (number, required): Total time in minutes
-- **servings** (number, required): Number of servings
+- **servings** (number, optional): Number of servings that one batch makes
 - **categories** (array, required): List of categories (e.g., Breakfast, Dinner, Dessert)
 - **tags** (array, required): List of tags for filtering
 - **ingredients** (array, required): Grouped ingredients
   - **group** (string, optional): Group heading (leave it out if no groups)
   - **items** (array): Ingredient lines, each with:
-    - **quantity** (number, optional): Amount for the recipe's `servings`, as a decimal (`2.25` shows as `2 1/4`). Leave it out for lines with no amount.
+    - **quantity** (number, optional): Amount for one batch (the recipe as written), as a decimal (`2.25` shows as `2 1/4`). Leave it out for lines with no amount.
     - **unit** (string, optional): Singular unit, for example `cup`, `tablespoon`, `teaspoon`, `lb`, `oz`, `clove`, `g`, `ml`. The page writes the plural form when the amount is more than one.
     - **item** (string, required): Ingredient name and notes, in the form for one (`large egg`)
     - **plural** (string, optional): Item text for amounts above one (`large eggs`)
-    - **fixed** (boolean, optional): `true` keeps the amount the same at all servings (a pinch, "to taste")
+    - **fixed** (boolean, optional): `true` keeps the amount the same at all batch sizes (a pinch, "to taste")
 - **steps** (array, required): Ordered list of instruction steps
 - **image** (string, optional): Image filename (not yet implemented)
 - **dateAdded** (date, required): ISO 8601 date when recipe was added
 
-### Servings Scaler
+### Batch Scaler
 
-Each recipe page has a servings scaler. The reader changes the servings with `+` / `-`, by typing a number, or with the `0.5x`, `1x`, `2x` and `3x` presets, and all scaling amounts update. Without JavaScript, the page shows the amounts as written.
+Each recipe page has a batch scaler. One batch is the recipe as written, so the scaler shows on every recipe, also on a recipe with no `servings` count. The reader changes the number of batches with `+` / `-` (half a batch for each step), by typing a multiplier, or with the `0.5x`, `1x`, `2x` and `3x` presets, and all scaling amounts update. Lines with `fixed: true` do not change. When the recipe has a `servings` count, the scaler also shows the servings that the batches make. Without JavaScript, the page shows the amounts as written.
 
 A US/metric unit switch is available but off by default. To show it, set `SHOW_UNIT_TOGGLE` to `true` in `src/config.ts`.
 
