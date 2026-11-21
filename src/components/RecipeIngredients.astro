@@ -1,10 +1,10 @@
 ---
-import { formatIngredient, type Ingredient } from '../lib/ingredients.ts';
+import { formatIngredient, formatServings, type Ingredient } from '../lib/ingredients.ts';
 import { SHOW_UNIT_TOGGLE } from '../config.ts';
 
 interface Props {
   ingredients: Array<{ group?: string; items: Ingredient[] }>;
-  /** Without a servings count, the scaler controls stay hidden. */
+  /** Optional. With a servings count, the scaler also shows the servings that the batches make. */
   servings?: number;
 }
 
@@ -25,19 +25,24 @@ const buttonClass =
     <h2 class="text-2xl font-bold mb-4">Ingredients</h2>
 
     <div data-scaler-controls hidden class="mb-6 space-y-3 print:hidden">
-      <div class="flex items-center gap-2">
-        <label for="scaler-servings" class="font-semibold text-gray-700">Servings</label>
-        <button type="button" data-step="-1" class={buttonClass} aria-label="Fewer servings">−</button>
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="scaler-batches" class="font-semibold text-gray-700">Batches</label>
+        <button type="button" data-step="-1" class={buttonClass} aria-label="Fewer batches">−</button>
         <input
-          id="scaler-servings"
+          id="scaler-batches"
           type="number"
           inputmode="decimal"
           min="0.25"
           step="any"
-          value={servings}
+          value="1"
           class="w-16 px-2 py-1 border border-gray-300 rounded-md text-center"
         />
-        <button type="button" data-step="1" class={buttonClass} aria-label="More servings">+</button>
+        <button type="button" data-step="1" class={buttonClass} aria-label="More batches">+</button>
+        {servings !== undefined && (
+          <span class="text-sm text-gray-600">
+            Makes <span data-servings-display>{formatServings(servings)}</span> servings
+          </span>
+        )}
       </div>
       <div class="flex flex-wrap gap-2" role="group" aria-label="Scale the recipe">
         {presets.map((preset) => (
@@ -72,73 +77,71 @@ const buttonClass =
 
 <script>
   import { formatIngredient, formatServings, type Ingredient, type UnitSystem } from '../lib/ingredients.ts';
+  import { formatMultiplier, parseMultiplier, scaledServings, stepMultiplier } from '../lib/scaler.ts';
 
+  /** Scales the ingredients by a batch multiplier. One batch is the recipe as written. */
   class RecipeScaler extends HTMLElement {
-    private defaultServings = 1;
-    private servings = 1;
+    private multiplier = 1;
+    private servings: number | undefined;
     private system: UnitSystem | undefined;
     private ingredients: Ingredient[] = [];
 
     connectedCallback() {
-      this.defaultServings = Number(this.dataset.servings);
-      this.servings = this.defaultServings;
+      const servings = Number(this.dataset.servings);
+      this.servings = servings > 0 ? servings : undefined;
       this.ingredients = JSON.parse(this.dataset.ingredients ?? '[]');
-      if (!(this.defaultServings > 0)) return;
 
       const controls = this.querySelector<HTMLElement>('[data-scaler-controls]');
-      const input = this.querySelector<HTMLInputElement>('#scaler-servings');
+      const input = this.querySelector<HTMLInputElement>('#scaler-batches');
       if (!controls || !input) return;
 
       input.addEventListener('input', () => {
-        const value = Number(input.value);
-        if (value > 0) this.update(value, false);
+        const value = parseMultiplier(input.value);
+        if (value !== undefined) this.update(value, false);
       });
       input.addEventListener('change', () => {
-        if (!(Number(input.value) > 0)) input.value = formatNumber(this.servings);
+        if (parseMultiplier(input.value) === undefined) input.value = formatMultiplier(this.multiplier);
       });
       this.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((button) => {
         button.addEventListener('click', () => {
-          const next = this.servings + Number(button.dataset.step);
-          if (next > 0) this.update(next);
+          this.update(stepMultiplier(this.multiplier, Number(button.dataset.step) === 1 ? 1 : -1));
         });
       });
       this.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((button) => {
-        button.addEventListener('click', () => this.update(this.defaultServings * Number(button.dataset.preset)));
+        button.addEventListener('click', () => this.update(Number(button.dataset.preset)));
       });
       this.querySelectorAll<HTMLButtonElement>('[data-system]').forEach((button) => {
         button.addEventListener('click', () => {
           this.system = button.dataset.system as UnitSystem;
-          this.update(this.servings);
+          this.update(this.multiplier);
         });
       });
 
       controls.hidden = false;
     }
 
-    private update(servings: number, writeInput = true) {
-      this.servings = servings;
-      const factor = servings / this.defaultServings;
+    private update(multiplier: number, writeInput = true) {
+      this.multiplier = multiplier;
 
       this.querySelectorAll<HTMLElement>('[data-ingredient]').forEach((element) => {
         const ingredient = this.ingredients[Number(element.dataset.ingredient)];
-        if (ingredient) element.textContent = formatIngredient(ingredient, factor, this.system);
+        if (ingredient) element.textContent = formatIngredient(ingredient, multiplier, this.system);
       });
-      document.querySelectorAll<HTMLElement>('[data-servings-display]').forEach((element) => {
-        element.textContent = formatServings(servings);
-      });
-      const input = this.querySelector<HTMLInputElement>('#scaler-servings');
-      if (input && writeInput) input.value = formatNumber(servings);
+      const servings = scaledServings(this.servings, multiplier);
+      if (servings !== undefined) {
+        document.querySelectorAll<HTMLElement>('[data-servings-display]').forEach((element) => {
+          element.textContent = formatServings(servings);
+        });
+      }
+      const input = this.querySelector<HTMLInputElement>('#scaler-batches');
+      if (input && writeInput) input.value = formatMultiplier(multiplier);
       this.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((button) => {
-        button.setAttribute('aria-pressed', String(Number(button.dataset.preset) === factor));
+        button.setAttribute('aria-pressed', String(Number(button.dataset.preset) === multiplier));
       });
       this.querySelectorAll<HTMLButtonElement>('[data-system]').forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.system === this.system));
       });
     }
-  }
-
-  function formatNumber(value: number): string {
-    return String(Math.round(value * 100) / 100);
   }
 
   customElements.define('recipe-scaler', RecipeScaler);
